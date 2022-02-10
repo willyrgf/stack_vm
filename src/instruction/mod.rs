@@ -21,7 +21,7 @@ impl<T: fmt::Debug> fmt::Debug for Instruction<T> {
 }
 
 impl<T: fmt::Debug> Instruction<T> {
-    fn new(op_code: usize, op_name: &str, arity: usize, fun: InstructionFn<T>) -> Self {
+    pub fn new(op_code: usize, op_name: &str, arity: usize, fun: InstructionFn<T>) -> Self {
         Instruction {
             op_code,
             op_name: String::from(op_name),
