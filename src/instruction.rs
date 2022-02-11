@@ -38,13 +38,17 @@ mod test {
     #[derive(Debug)]
     struct Operand(i64);
 
+    const OP_CODE: usize = 7;
+    const OP_NAME: &str = "noop";
+    const ARITY: usize = 3;
+
     fn noop(_machine: &mut Machine<Operand>, _args: &[usize]) {}
 
     #[test]
     fn new() {
-        let operand = Instruction::new(7, "noop", 3, noop);
-        assert_eq!(operand.op_code, 7);
-        assert_eq!(operand.op_name, "noop".to_string());
-        assert_eq!(operand.arity, 3);
+        let operand = Instruction::new(OP_CODE, OP_NAME, ARITY, noop);
+        assert_eq!(operand.op_code, OP_CODE);
+        assert_eq!(operand.op_name, OP_NAME);
+        assert_eq!(operand.arity, ARITY);
     }
 }

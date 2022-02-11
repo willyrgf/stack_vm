@@ -35,6 +35,10 @@ mod test {
     #[derive(Debug)]
     struct Operand(i64);
 
+    const OP_CODE: usize = 7;
+    const OP_NAME: &str = "noop";
+    const ARITY: usize = 3;
+
     fn noop(_machine: &mut Machine<Operand>, _args: &[usize]) {}
 
     #[test]
@@ -51,21 +55,21 @@ mod test {
 
     fn by_op_code() {
         let mut it: InstructionTable<Operand> = InstructionTable::new();
-        it.insert(Instruction::new(0, "noop", 0, noop));
+        it.insert(Instruction::new(OP_CODE, OP_NAME, ARITY, noop));
         let instruction = it.by_op_code(0).unwrap();
-        assert_eq!(instruction.op_name, "noop")
+        assert_eq!(instruction.op_name, OP_NAME)
     }
 
     fn by_op_name() {
         let mut it: InstructionTable<Operand> = InstructionTable::new();
-        it.insert(Instruction::new(0, "noop", 0, noop));
-        let instruction = it.by_op_name("noop").unwrap();
-        assert_eq!(instruction.op_code, 0);
+        it.insert(Instruction::new(OP_CODE, OP_NAME, ARITY, noop));
+        let instruction = it.by_op_name(OP_NAME).unwrap();
+        assert_eq!(instruction.op_code, OP_CODE);
     }
 
     fn insert() {
         let mut it: InstructionTable<Operand> = InstructionTable::new();
-        it.insert(Instruction::new(0, "noop", 0, noop));
+        it.insert(Instruction::new(OP_CODE, OP_NAME, ARITY, noop));
         assert!(!it.is_empty())
     }
 }

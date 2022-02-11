@@ -1,7 +1,7 @@
 pub struct Stack<T>(Vec<T>);
 
 impl<T> Stack<T> {
-    pub fn new() -> Stack<T> {
+    pub fn new() -> Self {
         Stack(vec![])
     }
 
