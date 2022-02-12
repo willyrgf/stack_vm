@@ -2,11 +2,14 @@ use crate::machine::Machine;
 use std::fmt;
 
 pub type InstructionFn<T> = fn(machine: &mut Machine<T>, args: &[usize]);
-
 pub struct Instruction<T: fmt::Debug> {
+    // instruction code
     pub op_code: usize,
+    // instruction name
     pub op_name: String,
+    // the number of arguments this instruction takes
     pub arity: usize,
+    // instruction
     pub fun: InstructionFn<T>,
 }
 
