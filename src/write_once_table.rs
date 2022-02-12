@@ -16,6 +16,7 @@ impl<T> WriteOnceTable<T> {
     }
 
     pub fn insert(&mut self, name: &str, value: T) {
+        self.already_exists_guard(name);
         let name = String::from(name);
         self.0.insert(name, value);
     }
