@@ -11,4 +11,5 @@ mod table;
 mod write_many_table;
 mod write_once_table;
 
+#[cfg(test)]
 mod tests;
