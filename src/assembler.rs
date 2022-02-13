@@ -1,6 +1,5 @@
-use std::{fmt, ptr::NonNull, str::ParseBoolError, sync::Arc};
-
-use crate::{instruction_table::InstructionTable, write_once_table::WriteOnceTable};
+use crate::{instruction_table::InstructionTable, table::Table, write_once_table::WriteOnceTable};
+use std::fmt;
 
 pub struct Assembler<'a, T: 'a + fmt::Debug + PartialEq> {
     pub instruction_table: &'a InstructionTable<T>,
