@@ -10,3 +10,5 @@ mod stack;
 mod table;
 mod write_many_table;
 mod write_once_table;
+
+mod tests;
