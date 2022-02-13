@@ -60,4 +60,12 @@ impl<'a, T: 'a + fmt::Debug + PartialEq> Assembler<'a, T> {
     pub fn label(&mut self, op_name: &str) {
         self.labels.insert(op_name, self.instructions.len());
     }
+
+    pub fn len(&self) -> usize {
+        self.instructions.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.instructions.is_empty()
+    }
 }
