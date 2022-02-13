@@ -59,4 +59,11 @@ impl<'a, T: 'a + fmt::Debug> Machine<'a, T> {
     pub fn operand_pop(&mut self) -> T {
         self.operand_stack.pop()
     }
+
+    pub fn get_data(&self, idx: usize) -> &T {
+        self.code
+            .data
+            .get(idx)
+            .unwrap_or_else(|| panic!("Error: data is not present at index {}", idx))
+    }
 }
