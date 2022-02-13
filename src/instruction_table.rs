@@ -26,6 +26,16 @@ impl<T: fmt::Debug> InstructionTable<T> {
     pub fn insert(&mut self, instruction: Instruction<T>) {
         self.0.insert(instruction.op_code, instruction);
     }
+
+    pub fn symbols(&self) -> Vec<(usize, String)> {
+        let mut result = vec![];
+        self.0.keys().for_each(|key| {
+            let inst = &self.0[key];
+            result.push((inst.op_code, inst.op_name.clone()));
+        });
+        result.sort_by(|lhs, rhs| lhs.0.cmp(&rhs.0));
+        result
+    }
 }
 
 mod test {

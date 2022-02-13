@@ -20,4 +20,14 @@ impl<T> WriteOnceTable<T> {
         let name = String::from(name);
         self.0.insert(name, value);
     }
+
+    pub fn keys(&self) -> Vec<String> {
+        let mut result = vec![];
+        self.0.keys().for_each(|key| result.push(key.to_string()));
+        result
+    }
+
+    pub fn get(&self, op_name: &str) -> Option<&T> {
+        self.0.get(op_name)
+    }
 }
