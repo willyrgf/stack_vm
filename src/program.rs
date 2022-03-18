@@ -1,5 +1,6 @@
 use crate::opcode::OpCode;
 
+#[derive(Debug)]
 pub struct Program {
     ip: usize,
     code: Vec<OpCode>,
@@ -35,11 +36,11 @@ impl Program {
         loop {
             match self.read_opcode() {
                 OpCode::Begin => {
-                    log::debug!("eval(): Begin");
+                    log::debug!("eval(): Begin, program: {:?}", self);
                     return;
                 }
                 OpCode::End => {
-                    log::debug!("eval(): End");
+                    log::debug!("eval(): End, program: {:?}", self);
                     return;
                 }
             }
