@@ -1,23 +1,25 @@
-use crate::opcode::OpCode;
+use crate::opcode::{self, OpCode, OpCodeValue};
 
 #[derive(Debug)]
-pub struct Program {
+pub struct Program<'a> {
     ip: usize,
-    code: Vec<OpCode>,
+    code: Vec<&'a str>,
+    stack: Vec<OpCodeValue>,
 }
 
-impl Program {
+impl<'a> Program<'a> {
     pub fn new() -> Self {
         Self {
             ip: 0,
             code: vec![],
+            stack: vec![],
         }
     }
 
-    fn read_opcode(&mut self) -> OpCode {
-        let c = self.code[self.ip];
+    fn read_opcode(&mut self) -> Option<OpCode> {
+        let t = self.code[self.ip];
         self.ip += 1;
-        c
+        opcode::read(t)
     }
 
     pub fn exec(&mut self, _program: &str) {
@@ -26,7 +28,10 @@ impl Program {
         // 2. compile the program to bytecode
         // let code = compile(ast);
 
-        self.code = vec![OpCode::End];
+        let script = "begin push.1 end";
+
+        self.code = script.split_whitespace().collect();
+
         self.ip = 0;
 
         self.eval()
@@ -34,7 +39,12 @@ impl Program {
 
     pub fn eval(&mut self) {
         loop {
-            match self.read_opcode() {
+            match self.read_opcode().unwrap() {
+                OpCode::Push => {
+                    log::debug!("eval(): Push, program: {:?}", self);
+                    // self.stack.push(value)
+                    return;
+                }
                 OpCode::Begin => {
                     log::debug!("eval(): Begin, program: {:?}", self);
                     return;
