@@ -13,6 +13,12 @@ pub struct Program {
     stack: [Value; STACK_LIMIT],
 }
 
+impl Default for Program {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Program {
     pub fn new() -> Self {
         Self {
@@ -40,7 +46,7 @@ impl Program {
     }
 
     pub fn pop(&mut self) -> Value {
-        if self.sp <= STACK_BEGIN {
+        if self.sp == STACK_BEGIN {
             //TODO: create a macro to todo that
             log::error!(
                 "push(): empty stack, self.sp: {}, STACK_BEGIN: {}",
@@ -51,9 +57,8 @@ impl Program {
         }
 
         self.sp -= 1;
-        let v = self.stack[self.sp];
 
-        v
+        self.stack[self.sp]
     }
 
     fn read_opcode(&mut self) -> u8 {
