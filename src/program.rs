@@ -1,25 +1,28 @@
-use crate::opcode::{self, OpCode, OpCodeValue};
+use crate::opcode::{self, OpCodeValue};
+use core::panic;
 
 #[derive(Debug)]
-pub struct Program<'a> {
+pub struct Program {
     ip: usize,
-    code: Vec<&'a str>,
+    sp: usize,
+    code: Vec<u8>,
     stack: Vec<OpCodeValue>,
 }
 
-impl<'a> Program<'a> {
+impl Program {
     pub fn new() -> Self {
         Self {
             ip: 0,
+            sp: 0,
             code: vec![],
             stack: vec![],
         }
     }
 
-    fn read_opcode(&mut self) -> Option<OpCode> {
+    fn read_opcode(&mut self) -> u8 {
         let t = self.code[self.ip];
         self.ip += 1;
-        opcode::read(t)
+        t
     }
 
     pub fn exec(&mut self, _program: &str) {
@@ -28,30 +31,21 @@ impl<'a> Program<'a> {
         // 2. compile the program to bytecode
         // let code = compile(ast);
 
-        let script = "begin push.1 end";
-
-        self.code = script.split_whitespace().collect();
-
-        self.ip = 0;
+        self.code = vec![opcode::OP_HALT];
 
         self.eval()
     }
 
     pub fn eval(&mut self) {
         loop {
-            match self.read_opcode().unwrap() {
-                OpCode::Push => {
-                    log::debug!("eval(): Push, program: {:?}", self);
-                    // self.stack.push(value)
+            match self.read_opcode() {
+                opcode::OP_HALT => {
+                    log::debug!("eval(): OP_HALT, program: {:?}", self);
                     return;
                 }
-                OpCode::Begin => {
-                    log::debug!("eval(): Begin, program: {:?}", self);
-                    return;
-                }
-                OpCode::End => {
-                    log::debug!("eval(): End, program: {:?}", self);
-                    return;
+                _ => {
+                    log::error!("eval(): opcode doesnt exist, program: {:?}", self);
+                    panic!()
                 }
             }
         }
