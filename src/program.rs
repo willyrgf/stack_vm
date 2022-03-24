@@ -57,8 +57,7 @@ impl Program {
     }
 
     fn read_opcode(&mut self) -> u8 {
-        let i = self.ip as usize;
-        let t = self.code[i];
+        let t = self.code[self.ip];
         self.ip += 1;
         t
     }
@@ -69,8 +68,17 @@ impl Program {
         // 2. compile the program to bytecode
         // let code = compile(ast);
 
-        self.constants.push(Value::Number(42));
-        self.code = vec![opcode::OP_CONST, 0, opcode::OP_HALT];
+        self.constants.push(Value::Number(2_f64));
+        self.constants.push(Value::Number(3_f64));
+
+        self.code = vec![
+            opcode::OP_CONST,
+            0,
+            opcode::OP_CONST,
+            1,
+            opcode::OP_ADD,
+            opcode::OP_HALT,
+        ];
 
         self.eval()
     }
@@ -101,6 +109,18 @@ impl Program {
                         self.sp,
                         self.stack
                     );
+                }
+
+                opcode::OP_ADD => {
+                    log::debug!("eval(): OP_CONST, program: {:?}", self.code);
+
+                    //TODO: add macro to binary operation
+                    let op1 = self.pop().as_number();
+                    let op2 = self.pop().as_number();
+
+                    let result = op1 + op2;
+
+                    self.push(Value::Number(result));
                 }
                 _ => {
                     log::error!("eval(): opcode doesnt exist, program: {:?}", self);

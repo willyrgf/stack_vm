@@ -7,5 +7,9 @@ fn main() {
     let mut program = Program::new();
     let result = program.exec("");
 
-    log::debug!("main(): result: {:?}", result);
+    log::debug!(
+        "main(): result: {:?}, result.as_number(): {}",
+        result,
+        result.as_number()
+    );
 }
