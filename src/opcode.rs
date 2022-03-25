@@ -23,6 +23,10 @@ macro_rules! into_raw {
 }
 
 impl Value {
+    pub fn is_number(&self) -> bool {
+        self.try_as_number().is_some()
+    }
+
     pub fn try_as_number(&self) -> Option<f64> {
         into_raw!(self, Self::Number)
     }
@@ -38,6 +42,10 @@ impl Value {
                 panic!()
             }
         }
+    }
+
+    pub fn is_string(&self) -> bool {
+        self.try_as_string().is_some()
     }
 
     pub fn try_as_string(&self) -> Option<String> {
@@ -56,4 +64,12 @@ impl Value {
             }
         }
     }
+}
+
+pub fn are_values_numbers(values: Vec<&Value>) -> bool {
+    values.into_iter().all(|v| v.is_number())
+}
+
+pub fn are_values_strings(values: Vec<&Value>) -> bool {
+    values.into_iter().all(|v| v.is_string())
 }

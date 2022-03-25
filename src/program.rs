@@ -1,13 +1,14 @@
+use core::panic;
+use std::ops::Add;
+
 use crate::opcode::{self, Value};
 
 const STACK_LIMIT: usize = 512;
 const STACK_BEGIN: usize = 0;
 
 macro_rules! binary_op {
-    ($stack:expr, $op:tt) => {
-        let v2 = $stack.pop().as_number();
-        let v1 = $stack.pop().as_number();
-        $stack.push(Value::Number(v1 $op v2));
+    ($stack:expr, $v1:expr, $v2:expr, $op:tt) => {
+        $stack.push(Value::Number($v1 $op $v2))
     };
 }
 
@@ -56,7 +57,7 @@ impl Program {
         if self.sp == STACK_BEGIN {
             //TODO: create a macro to todo that
             log::error!(
-                "push(): empty stack, self.sp: {}, STACK_BEGIN: {}",
+                "pop(): empty stack, self.sp: {}, STACK_BEGIN: {}",
                 self.sp,
                 STACK_BEGIN
             );
@@ -64,7 +65,7 @@ impl Program {
         }
 
         self.sp -= 1;
-        self.stack[self.sp].clone()
+        self.stack.pop().unwrap()
     }
 
     fn read_opcode(&mut self) -> u8 {
@@ -79,8 +80,10 @@ impl Program {
         // 2. compile the program to bytecode
         // let code = compile(ast);
 
-        self.constants.push(Value::Number(10_f64));
-        self.constants.push(Value::Number(2_f64));
+        // self.constants.push(Value::Number(10_f64));
+        // self.constants.push(Value::Number(2_f64));
+        self.constants.push(Value::String("Hello, ".to_string()));
+        self.constants.push(Value::String("World".to_string()));
 
         self.code = vec![
             opcode::OP_CONST,
@@ -116,26 +119,67 @@ impl Program {
 
                     log::debug!(
                         "eval(): OP_CONST, sp: {:?}, value: {:?}, stack: {:?}",
-                        value,
                         self.sp,
+                        value,
                         self.stack
                     );
                 }
                 opcode::OP_ADD => {
                     log::debug!("eval(): OP_ADD, program: {:?}", self.code);
-                    binary_op!(self, +);
+
+                    let value2 = self.pop();
+                    let value1 = self.pop();
+
+                    //TODO: improve this code
+                    if opcode::are_values_numbers(vec![&value1, &value2]) {
+                        binary_op!(self, value1.as_number(), value2.as_number(), +);
+                    } else if opcode::are_values_strings(vec![&value1, &value2]) {
+                        let s = value1.as_string().add(&value2.as_string());
+                        self.push(Value::String(s))
+                    } else {
+                        log::debug!("value1: {:?}, value2: {:?}", value1, value2);
+                        log::error!("eval(): OP_ADD, this operation only supports: Value::Number, Value::String");
+                        panic!()
+                    }
                 }
                 opcode::OP_SUB => {
                     log::debug!("eval(): OP_SUB, program: {:?}", self.code);
-                    binary_op!(self, -);
+
+                    let value2 = self.pop();
+                    let value1 = self.pop();
+
+                    if !(opcode::are_values_numbers(vec![&value1, &value2])) {
+                        log::error!("eval(): OP_SUB, this operation only supports: Value::Number");
+                        panic!()
+                    }
+
+                    binary_op!(self, value1.as_number(), value2.as_number(), -)
                 }
                 opcode::OP_MUL => {
                     log::debug!("eval(): OP_MUL, program: {:?}", self.code);
-                    binary_op!(self, *);
+
+                    let value2 = self.pop();
+                    let value1 = self.pop();
+
+                    if !(opcode::are_values_numbers(vec![&value1, &value2])) {
+                        log::error!("eval(): OP_MUL, this operation only supports: Value::Number");
+                        panic!()
+                    }
+
+                    binary_op!(self, value1.as_number(), value2.as_number(), *)
                 }
                 opcode::OP_DIV => {
                     log::debug!("eval(): OP_DIV, program: {:?}", self.code);
-                    binary_op!(self, /);
+
+                    let value2 = self.pop();
+                    let value1 = self.pop();
+
+                    if !(opcode::are_values_numbers(vec![&value1, &value2])) {
+                        log::error!("eval(): OP_DIV, this operation only supports: Value::Number");
+                        panic!()
+                    }
+
+                    binary_op!(self, value1.as_number(), value2.as_number(), /)
                 }
                 _ => {
                     log::error!("eval(): opcode doesnt exist, program: {:?}", self);
