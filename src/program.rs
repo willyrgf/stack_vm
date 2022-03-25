@@ -17,7 +17,7 @@ pub struct Program {
     sp: usize,
     code: Vec<u8>,
     constants: Vec<Value>,
-    stack: [Value; STACK_LIMIT],
+    stack: Vec<Value>,
 }
 
 impl Default for Program {
@@ -33,7 +33,7 @@ impl Program {
             sp: 0,
             code: vec![],
             constants: vec![],
-            stack: [Value::None; STACK_LIMIT],
+            stack: vec![],
         }
     }
 
@@ -48,7 +48,7 @@ impl Program {
             panic!()
         }
 
-        self.stack[self.sp] = value;
+        self.stack.push(value);
         self.sp += 1;
     }
 
@@ -64,8 +64,7 @@ impl Program {
         }
 
         self.sp -= 1;
-
-        self.stack[self.sp]
+        self.stack[self.sp].clone()
     }
 
     fn read_opcode(&mut self) -> u8 {
@@ -112,8 +111,8 @@ impl Program {
                         self.constants
                     );
 
-                    let value = self.constants[index];
-                    self.push(value);
+                    let value = self.constants[index].clone();
+                    self.push(value.clone());
 
                     log::debug!(
                         "eval(): OP_CONST, sp: {:?}, value: {:?}, stack: {:?}",
