@@ -90,7 +90,7 @@ impl Program {
             0,
             opcode::OP_CONST,
             1,
-            opcode::OP_DIV,
+            opcode::OP_ADD,
             opcode::OP_HALT,
         ];
 
