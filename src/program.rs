@@ -1,7 +1,10 @@
 use core::panic;
 use std::ops::Add;
 
-use crate::opcode::{self, Value};
+use crate::{
+    compiler::compile,
+    opcode::{self, Value},
+};
 
 const STACK_LIMIT: usize = 512;
 const STACK_BEGIN: usize = 0;
@@ -74,7 +77,7 @@ impl Program {
         t
     }
 
-    pub fn exec(&mut self, _program: &str) -> Value {
+    pub fn exec(&mut self, program_code: &str) -> Value {
         // 1. parser the program
         // let ast = parser(program);
         // 2. compile the program to bytecode
@@ -82,6 +85,13 @@ impl Program {
 
         // self.constants.push(Value::Number(10_f64));
         // self.constants.push(Value::Number(2_f64));
+
+        //TODO: implement a s-expression parser in another crate
+        let s_expressions = sexp::parse(program_code).unwrap();
+
+        // TODO: use this code for eval
+        let _code = compile(s_expressions);
+
         self.constants.push(Value::String("Hello, ".to_string()));
         self.constants.push(Value::String("World".to_string()));
 
