@@ -1,24 +1,48 @@
-pub fn compile(expressions: sexp::Sexp) -> Vec<u8> {
-    //TODO: implement a s-expression parser in another crate
-    if let sexp::Sexp::List(l) = expressions {
-        log::debug!("l: {:?}", l);
-        // FIXME: do it recursively in compiler module
-        l.iter().for_each(|t| match t {
-            sexp::Sexp::List(ll) => {
-                log::debug!("ll: {:?}", ll);
-                ll.iter().for_each(|tt| match tt {
-                    sexp::Sexp::List(lll) => {
-                        log::debug!("lll: {:?}", lll);
-                    }
-                    sexp::Sexp::Atom(aaa) => {
-                        log::debug!("aaa: {:?}", aaa);
-                    }
-                })
-            }
-            sexp::Sexp::Atom(aa) => {
-                log::debug!("aa: {:?}", aa);
-            }
-        });
+use crate::opcode::{self, Value};
+
+#[derive(Debug, Default)]
+pub struct CompiledCode {
+    code: Vec<u8>,
+    constants: Vec<Value>,
+    pos: u8,
+}
+
+impl CompiledCode {
+    fn gen(&mut self, expressions: sexp::Sexp) {
+        match expressions {
+            sexp::Sexp::List(l) => l.into_iter().for_each(|e| {
+                self.pos += 1;
+                self.gen(e);
+            }),
+            sexp::Sexp::Atom(a) => match a {
+                sexp::Atom::I(n) => {
+                    self.code.push(opcode::OP_CONST);
+                    self.code.push(self.constants.len() as u8);
+                    self.constants.push(Value::Number(n as f64));
+                }
+                sexp::Atom::F(n) => {
+                    self.code.push(opcode::OP_CONST);
+                    self.code.push(self.constants.len() as u8);
+                    self.constants.push(Value::Number(n));
+                }
+                sexp::Atom::S(s) => {
+                    //TODO: handle with special characters like ops + - * /
+                    self.code.push(opcode::OP_CONST);
+                    self.code.push(self.constants.len() as u8);
+                    self.constants.push(Value::String(s));
+                }
+            },
+        }
     }
-    vec![]
+}
+
+pub fn compile(expressions: sexp::Sexp) -> CompiledCode {
+    let mut cc = CompiledCode::default();
+
+    //TODO: implement a s-expression parser in another crate
+    cc.gen(expressions);
+    cc.code.push(opcode::OP_HALT);
+
+    log::debug!("compile(): cc: {:?}", cc);
+    cc
 }

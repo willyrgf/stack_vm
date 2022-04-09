@@ -2,7 +2,7 @@ use core::panic;
 use std::ops::Add;
 
 use crate::{
-    compiler::compile,
+    compiler,
     opcode::{self, Value},
 };
 
@@ -90,7 +90,7 @@ impl Program {
         let s_expressions = sexp::parse(program_code).unwrap();
 
         // TODO: use this code for eval
-        let _code = compile(s_expressions);
+        let _code = compiler::compile(s_expressions);
 
         self.constants.push(Value::String("Hello, ".to_string()));
         self.constants.push(Value::String("World".to_string()));
@@ -103,6 +103,8 @@ impl Program {
             opcode::OP_ADD,
             opcode::OP_HALT,
         ];
+
+        log::debug!("program(): self.code: {:?}", self.code);
 
         self.eval()
     }
