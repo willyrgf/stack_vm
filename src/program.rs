@@ -90,12 +90,19 @@ impl Program {
         let s_expressions = sexp::parse(program_code).unwrap();
 
         // TODO: use this code for eval
-        let _code = compiler::compile(s_expressions);
+        let compiled_code = compiler::compile(s_expressions);
 
-        self.constants.push(Value::String("Hello, ".to_string()));
-        self.constants.push(Value::String("World".to_string()));
+        self.constants = compiled_code.constants();
+        self.code = compiled_code.code();
 
-        self.code = vec![
+        let v = vec![
+            Value::String("Hello, ".to_string()),
+            Value::String("World".to_string()),
+        ];
+        // self.constants.push(Value::String("Hello, ".to_string()));
+        // self.constants.push(Value::String("World".to_string()));
+
+        let c = vec![
             opcode::OP_CONST,
             0,
             opcode::OP_CONST,
@@ -104,7 +111,10 @@ impl Program {
             opcode::OP_HALT,
         ];
 
+        log::debug!("program(): c expectd: {:?}", c);
+        log::debug!("program(): v expectd: {:?}", v);
         log::debug!("program(): self.code: {:?}", self.code);
+        log::debug!("program(): self.constants: {:?}", self.constants);
 
         self.eval()
     }

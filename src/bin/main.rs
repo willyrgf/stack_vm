@@ -13,7 +13,7 @@ fn main() {
 
     let code = r#"
     (
-        (+ Hello World)
+        (+ Hello, World)
     )
     "#;
 
