@@ -11,9 +11,10 @@ fn main() {
     // )
     // "#;
 
+    // (+ Hello, World)
     let code = r#"
     (
-        (+ Hello, World)
+        ( - (+ 40 3) 10)
     )
     "#;
 
