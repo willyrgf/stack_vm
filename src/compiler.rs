@@ -6,13 +6,13 @@ pub struct CompiledCode {
     constants: Vec<Value>,
 }
 
-fn symbol(s: sexp::Sexp) -> Option<String> {
+fn symbol_to_opcode(s: sexp::Sexp) -> Option<u8> {
     match s {
         sexp::Sexp::Atom(sexp::Atom::S(s)) => match s.as_str() {
-            "+" => Some("+".to_string()),
-            "-" => Some("-".to_string()),
-            "*" => Some("*".to_string()),
-            "/" => Some("/".to_string()),
+            "+" => Some(opcode::OP_ADD),
+            "-" => Some(opcode::OP_SUB),
+            "*" => Some(opcode::OP_MUL),
+            "/" => Some(opcode::OP_DIV),
             _ => None,
         },
         _ => None,
@@ -32,19 +32,11 @@ impl CompiledCode {
             sexp::Sexp::List(l) => {
                 let e = l[0].clone();
 
-                match symbol(e.clone()) {
-                    Some(symbol) => {
+                match symbol_to_opcode(e.clone()) {
+                    Some(op) => {
                         self.gen(l[1].clone());
                         self.gen(l[2].clone());
-                        match symbol.as_str() {
-                            "+" => self.code.push(opcode::OP_ADD),
-                            "-" => self.code.push(opcode::OP_SUB),
-                            "*" => self.code.push(opcode::OP_MUL),
-                            "/" => self.code.push(opcode::OP_DIV),
-                            _ => {
-                                panic!("gen(): unreachable code");
-                            }
-                        }
+                        self.code.push(op);
                     }
                     _ => self.gen(e),
                 }
@@ -77,6 +69,6 @@ pub fn compile(expressions: sexp::Sexp) -> CompiledCode {
     cc.gen(expressions);
     cc.code.push(opcode::OP_HALT);
 
-    log::debug!("compile(): cc: {:?}", cc);
+    log::debug!("compile(): compiled_code: {:?}", cc);
     cc
 }

@@ -4,17 +4,10 @@ use stack_vm::program::Program;
 fn main() {
     Builder::from_env(Env::default().default_filter_or("debug")).init();
 
-    // let code = r#"
-    // (
-    //     (+ 5 2)
-    //     (print "hello")
-    // )
-    // "#;
-
-    // (+ Hello, World)
+    // (+ (+ "Hello " "World, ") Willy)
     let code = r#"
     (
-        ( - (+ 40 3) 10)
+        (- ( / (* 40 3) 10) 2)
     )
     "#;
 
