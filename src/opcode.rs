@@ -4,6 +4,15 @@ pub const OP_ADD: u8 = 0x02;
 pub const OP_SUB: u8 = 0x03;
 pub const OP_MUL: u8 = 0x04;
 pub const OP_DIV: u8 = 0x05;
+pub const OP_EQ: u8 = 0x06;
+pub const OP_NE: u8 = 0x07;
+pub const OP_GE: u8 = 0x08;
+pub const OP_LE: u8 = 0x09;
+pub const OP_GT: u8 = 0x10;
+pub const OP_LT: u8 = 0x11;
+pub const OP_TRUE: u8 = 0x11;
+
+//TODO: add a OP to true and false?
 
 #[derive(Debug, Clone)]
 // A Value for the stack. (tagged union)
@@ -11,6 +20,7 @@ pub enum Value {
     None,
     Number(f64),
     String(String),
+    Bool(bool),
 }
 
 macro_rules! into_raw {
@@ -20,6 +30,34 @@ macro_rules! into_raw {
             _ => None,
         }
     };
+}
+
+impl From<i64> for Value {
+    fn from(i: i64) -> Self {
+        Value::Number(i as f64)
+    }
+}
+
+impl From<f64> for Value {
+    fn from(f: f64) -> Self {
+        Value::Number(f)
+    }
+}
+
+impl From<String> for Value {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "true" => Value::Bool(true),
+            "false" => Value::Bool(false),
+            _ => Value::String(s),
+        }
+    }
+}
+
+impl From<bool> for Value {
+    fn from(b: bool) -> Self {
+        Value::Bool(b)
+    }
 }
 
 impl Value {
@@ -64,6 +102,27 @@ impl Value {
             }
         }
     }
+
+    pub fn is_bool(&self) -> bool {
+        self.try_as_bool().is_some()
+    }
+
+    pub fn try_as_bool(&self) -> Option<bool> {
+        into_raw!(self, Self::Bool)
+    }
+
+    pub fn as_bool(&self) -> bool {
+        match self.try_as_bool() {
+            Some(v) => v,
+            None => {
+                log::error!(
+                    "as_bool!(): value must be a opcode::Value::Bool, value: {:?}",
+                    self,
+                );
+                panic!()
+            }
+        }
+    }
 }
 
 pub fn are_values_numbers(values: Vec<&Value>) -> bool {
@@ -72,4 +131,8 @@ pub fn are_values_numbers(values: Vec<&Value>) -> bool {
 
 pub fn are_values_strings(values: Vec<&Value>) -> bool {
     values.into_iter().all(|v| v.is_string())
+}
+
+pub fn are_values_bools(values: Vec<&Value>) -> bool {
+    values.into_iter().all(|v| v.is_bool())
 }

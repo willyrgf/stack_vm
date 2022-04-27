@@ -56,11 +56,11 @@ impl CompiledCode {
                 }
             }
             sexp::Sexp::Atom(a) => match a {
-                sexp::Atom::I(n) => {
-                    add_const_with_value!(self, n);
+                sexp::Atom::I(i) => {
+                    add_const_with_value!(self, i);
                 }
-                sexp::Atom::F(n) => {
-                    add_const_with_value!(self, n);
+                sexp::Atom::F(f) => {
+                    add_const_with_value!(self, f);
                 }
                 sexp::Atom::S(s) => {
                     add_const_with_value!(self, s);
