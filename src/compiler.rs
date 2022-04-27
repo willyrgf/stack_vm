@@ -1,5 +1,13 @@
 use crate::opcode::{self, Value};
 
+macro_rules! add_const_with_value {
+    ($cc:expr, $v1:expr) => {
+        $cc.code.push(opcode::OP_CONST);
+        $cc.code.push($cc.constants.len().try_into().unwrap());
+        $cc.constants.push(Value::from($v1));
+    };
+}
+
 #[derive(Debug, Default)]
 pub struct CompiledCode {
     code: Vec<u8>,
@@ -13,6 +21,12 @@ fn symbol_to_opcode(s: sexp::Sexp) -> Option<u8> {
             "-" => Some(opcode::OP_SUB),
             "*" => Some(opcode::OP_MUL),
             "/" => Some(opcode::OP_DIV),
+            "==" => Some(opcode::OP_EQ),
+            "!=" => Some(opcode::OP_NE),
+            ">" => Some(opcode::OP_GT),
+            "<" => Some(opcode::OP_LT),
+            ">=" => Some(opcode::OP_GE),
+            "<=" => Some(opcode::OP_LE),
             _ => None,
         },
         _ => None,
@@ -43,19 +57,13 @@ impl CompiledCode {
             }
             sexp::Sexp::Atom(a) => match a {
                 sexp::Atom::I(n) => {
-                    self.code.push(opcode::OP_CONST);
-                    self.code.push(self.constants.len() as u8);
-                    self.constants.push(Value::Number(n as f64));
+                    add_const_with_value!(self, n);
                 }
                 sexp::Atom::F(n) => {
-                    self.code.push(opcode::OP_CONST);
-                    self.code.push(self.constants.len() as u8);
-                    self.constants.push(Value::Number(n));
+                    add_const_with_value!(self, n);
                 }
                 sexp::Atom::S(s) => {
-                    self.code.push(opcode::OP_CONST);
-                    self.code.push(self.constants.len() as u8);
-                    self.constants.push(Value::String(s));
+                    add_const_with_value!(self, s);
                 }
             },
         }
